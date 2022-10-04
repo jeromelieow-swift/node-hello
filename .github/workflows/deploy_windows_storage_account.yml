@@ -12,7 +12,7 @@ on:
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
   DOTNET_VERSION: '6.0.x' # set this to the dotnet version to use
-  WEBAPP: swiftid-apione-dev-fx
+  WEB_APP: swiftid-apione-dev-fx
   APP_GROUP: app-rg
   STORAGE_GROUP: storage-rg
   ACCOUNT: swiftpassdevcicd001st # Does not have to exist, this will be created for you
@@ -80,5 +80,5 @@ jobs:
             az storage container create -n $CONTAINER --account-name $ACCOUNT
             az storage blob upload      -f output.zip    --account-name $ACCOUNT -c $CONTAINER -n $ACCOUNT
             ZIP_URL=$(az storage blob generate-sas --full-uri --permissions r --expiry ${{ env.expiry }} --account-name $ACCOUNT -c $CONTAINER -n $ACCOUNT | xargs)
-            az rest --method PUT --uri https://management.azure.com/subscriptions/${{ secrets.SUBSCRIPTIONID }}/resourceGroups/${APP_GROUP}/providers/Microsoft.Web/sites/${WEBAPP}/extensions/onedeploy?api-version=2022-03-01 --body '{"properties": {"type": "zip", "packageUri": "'"${ZIP_URL}"'" }}'
+            az rest --method PUT --uri https://management.azure.com/subscriptions/${{ secrets.SUBSCRIPTIONID }}/resourceGroups/${APP_GROUP}/providers/Microsoft.Web/sites/${WEB_APP}/extensions/onedeploy?api-version=2022-03-01 --body '{"properties": {"type": "zip", "packageUri": "'"${ZIP_URL}"'" }}'
             az storage container delete -n $CONTAINER --account-name $ACCOUNT

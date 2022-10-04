@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  WEBAPP: linux-as
+  WEB_APP: linux-as
   GROUP: jerome-to-be-deleted-deploy-test
   ACCOUNT: nodehello001st # Does not have to exist, this will be created for you
   CONTAINER: nodehello001c
@@ -78,6 +78,6 @@ jobs:
 
             ZIP_URL=$(az storage blob generate-sas --full-uri --permissions r --expiry ${{ env.expiry }} --account-name $ACCOUNT -c $CONTAINER -n $ACCOUNT | xargs)
 
-            az rest --method PUT --uri https://management.azure.com/subscriptions/${{ secrets.SUBSCRIPTIONID }}/resourceGroups/${GROUP}/providers/Microsoft.Web/sites/${WEBAPP}/extensions/onedeploy?api-version=2022-03-01 --body '{"properties": {"type": "zip", "packageUri": "'"${ZIP_URL}"'" }}'
+            az rest --method PUT --uri https://management.azure.com/subscriptions/${{ secrets.SUBSCRIPTIONID }}/resourceGroups/${GROUP}/providers/Microsoft.Web/sites/${WEB_APP}/extensions/onedeploy?api-version=2022-03-01 --body '{"properties": {"type": "zip", "packageUri": "'"${ZIP_URL}"'" }}'
 
             az storage container delete -n $CONTAINER --account-name $ACCOUNT
