@@ -15,8 +15,8 @@ env:
   WEB_APP: swiftid-apione-dev-fx
   APP_GROUP: app-rg
   STORAGE_GROUP: storage-rg
-  ACCOUNT: swiftpassdevcicd001st # Does not have to exist, this will be created for you
-  CONTAINER: swiftpassdevcicd001c
+  STORAGE_ACCOUNT: swiftpassdevcicd001st # Does not have to exist, this will be created for you
+  STORAGE_CONTAINER: swiftpassdevcicd001c
   EXPIRY_TIME: 10 minutes
   LOCATION: southeastasia
 
@@ -76,9 +76,9 @@ jobs:
           azcliversion: 2.30.0
           inlineScript: |
             az extension add --name webapp
-            az storage account create   -n $ACCOUNT   -g $STORAGE_GROUP -l $LOCATION
-            az storage container create -n $CONTAINER --account-name $ACCOUNT
-            az storage blob upload      -f output.zip    --account-name $ACCOUNT -c $CONTAINER -n $ACCOUNT
-            ZIP_URL=$(az storage blob generate-sas --full-uri --permissions r --expiry ${{ env.expiry }} --account-name $ACCOUNT -c $CONTAINER -n $ACCOUNT | xargs)
+            az storage account create   -n $STORAGE_ACCOUNT   -g $STORAGE_GROUP -l $LOCATION
+            az storage container create -n $STORAGE_CONTAINER --account-name $STORAGE_ACCOUNT
+            az storage blob upload      -f output.zip    --account-name $STORAGE_ACCOUNT -c $STORAGE_CONTAINER -n $STORAGE_ACCOUNT
+            ZIP_URL=$(az storage blob generate-sas --full-uri --permissions r --expiry ${{ env.expiry }} --account-name $STORAGE_ACCOUNT -c $STORAGE_CONTAINER -n $STORAGE_ACCOUNT | xargs)
             az rest --method PUT --uri https://management.azure.com/subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${APP_GROUP}/providers/Microsoft.Web/sites/${WEB_APP}/extensions/onedeploy?api-version=2022-03-01 --body '{"properties": {"type": "zip", "packageUri": "'"${ZIP_URL}"'" }}'
-            az storage container delete -n $CONTAINER --account-name $ACCOUNT
+            az storage container delete -n $STORAGE_CONTAINER --account-name $STORAGE_ACCOUNT
